@@ -2,7 +2,7 @@
 
 const string fastqlistname = "BGI_fastqnamelist.txt";
 const string fanselistname = "BGI_fansenamelist.txt";
-
+const int batch_step = 8;
 int main()
 {
 	ifstream fastqlistin(fastqlistname);
@@ -35,10 +35,11 @@ int main()
 		fanselist.emplace_back(temp);
 	}
 	vector<vector<quality_inform>> quality_matrix;
-	for (int batch = 0; batch < fanselist.size() / 2; batch = batch + 3)//每次处理3对即6组，用到6个核
+	for (int batch = 0; batch < fanselist.size() / 2; batch = batch + batch_step)//每次处理3对即6组，用到6个核
 	{
 		//用fastq数据填充quality_matrix
-		for (int f = 2*batch;f<2*(batch+3);f++)
+		int upperbound = (batch + batch_step < fanselist.size() / 2) ? batch + batch_step : fanselist.size() / 2;//选小的作为上界的因子，防止最后一轮越界
+		for (int f = 2*batch;f<2*(upperbound);f++)
 		{
 			ifstream fastqin(fastqlist[f]);
 			cout << "Opening " << fastqlist[f] << "...\n";
@@ -70,7 +71,7 @@ int main()
 		cout << "fastq batch reading complete!\n";
 	//开始读入和处理fanse文件
 		vector<future<void>> main_future;
-		for (int i = batch; i < batch + 3; i++)
+		for (int i = batch; i < upperbound; i++)
 		{
 			main_future.emplace_back(async(launch::async, main_thread, ref(fanselist), i, ref(quality_matrix)));
 		}
