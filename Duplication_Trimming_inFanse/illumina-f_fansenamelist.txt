@@ -1,0 +1,2 @@
+\\fs\Seq\20170510-DNASequencing-BW25113_DNA_RNC_16sBulk_钟嘉泳_郑廷锴\fastq\DNA_截除第一位碱基\去除低质量序列后fastq\ZTK_DNA_1-1_S17_L002_R1_001_trimmed1-f-MG1655Genome20170511as.fanse3
+\\fs\Seq\20170510-DNASequencing-BW25113_DNA_RNC_16sBulk_钟嘉泳_郑廷锴\fastq\DNA_截除第一位碱基\去除低质量序列后fastq\ZTK_DNA_1-1_S17_L002_R2_001_trimmed1-f-MG1655Genome20170511as.fanse3
