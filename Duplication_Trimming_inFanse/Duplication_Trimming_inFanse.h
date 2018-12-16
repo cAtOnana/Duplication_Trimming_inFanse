@@ -21,6 +21,8 @@ struct fanse {
 	int mappingsite;
 	int mappingsite_num;
 	friend ostream& operator<<(ostream& out, const fanse& f);
+	//
+	int adapted_length=0;
 };
 struct quality_inform
 {

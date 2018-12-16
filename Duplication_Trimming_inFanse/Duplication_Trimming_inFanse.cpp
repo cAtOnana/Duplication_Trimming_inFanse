@@ -98,17 +98,16 @@ void adapt_indel(vector<fanse>& f_list)
 {
 	for (auto& f : f_list)
 	{
+		f.adapted_length = f.seq.length();
 		for (int i = 0; i < f.errorseq.length(); i++)
 		{
 			if (f.errorseq[i] == '-')
 			{
-				f.seq.insert(i, 1, 'I');
+				f.adapted_length++;
 			}
 			else if (isupper(f.errorseq[i]))
 			{
-				f.seq.erase(i, 1);
-				f.errorseq.erase(i, 1);
-				i--;
+				f.adapted_length--;
 			}
 		}
 	}
@@ -122,7 +121,7 @@ void extract_inform_list(map<int, fanse_inform>& Finform_map, const vector<fanse
 		temp.order = f.order;
 		temp.strand = f.strand;
 		if (temp.strand == "R")//因为序列被截短过，反链mapping位点对应的是其序列3端，不准确，通过以下方式转化为其5端坐标
-			temp.mappingsite = f.mappingsite + f.seq.length() - 1;
+			temp.mappingsite = f.mappingsite + f.adapted_length - 1;
 		else
 			temp.mappingsite = f.mappingsite;
 		temp.q = q_list[temp.order-1];
@@ -140,7 +139,7 @@ map<int, fanse_inform> thread_task(ifstream& fansein,const vector<quality_inform
 		if (!fansein) break;
 		ALL_reads.emplace_back(temp);
 	}
-	adapt_indel(ALL_reads);
+	adapt_indel(ALL_reads);//会修改原序列 //20181216 将对序列的直接修改改为对长度值的修改，不会影响下游流程
 	//还是采用GATK标准方法，不区分序列是否带indel
 	extract_inform_list(Finform_map, ALL_reads, q_list);
 	return move(Finform_map);
@@ -243,6 +242,8 @@ void main_thread(const vector<string>& fanselist,int i ,const vector<vector<qual
 	auto out_fu2 = async(std::launch::async, thread_output, ref(fanselist), f_2, ref(outputlist2), ref(outputsingle), ref(ALL_reads2));
 	out_fu1.wait();
 	out_fu2.wait();
+	ALL_reads1.clear();
+	ALL_reads2.clear();
 	cout << fanselist[f_1] << " & " << fanselist[f_2] << " Output complete! Congra.\n";
 	return;
 }
